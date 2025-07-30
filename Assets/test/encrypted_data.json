@@ -1,0 +1,9 @@
+{
+    "salt": "6N+bhgiY90ZH2B8mcgKovA==",
+    "iv": "VTL8Zlh+OqELRNUd",
+    "ciphertext": "uCC/oGuh1n6Hza2LUR1J6Umy/GdAX6klJRySbKCJirWLgo8W4gN97QKPMmMbdQ840sYD6lFNKeYJKzPCDQy1JjzrpmQOdO5rewNhQyXXyZ5WnOorka7CSD0fyjHaDaJwNi8qCc59GOFDyeeDlnNYB2JQOifUiy6MU1EVug+j8lh+mj0cy7eDPw==",
+    "tag": "M4UzN3g0pfGpLOjlrWRP2Q==",
+    "timestamp": "2025-07-28T23:16:30.619414",
+    "iterations": 100000,
+    "salt_length": 16
+}

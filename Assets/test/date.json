@@ -1,0 +1,6 @@
+{
+  "ephemeral_public_key": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEhWiWO+fuJTeUCr1ddQR5QWVRPe5p\nj7K5Y0oNaKimxMpMSYRFjDw7vKqJNmW4sn1rVT3db8HY8VicIOqQ2+oYWA==\n-----END PUBLIC KEY-----\n",
+  "ciphertext": "+E+EYDycuulcivHpatUvSz0Sp+BWiNqu4MnHkgZ9H9fO9/KMTSUOfO3+ZFOEo4Jdz75LLpsaoq13S7gRJ4Pr8l4UvvfdcX/NbYSXpCgsa5rMlUyAX+yhdRdFx5D6xaO44+uEi15bQCg4bG4N4A3cAkdjY2dSDnsCrzkNTAfVwlI7GLJMlKyG/Gippk8hDYHr",
+  "algorithm": "ECC_AES256_CBC_PKCS7",
+  "original_data_length": 136
+}

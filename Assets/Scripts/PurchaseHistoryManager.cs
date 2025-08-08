@@ -1,9 +1,10 @@
 using UnityEngine;
+using UnityEngine;
 using UnityEngine.Networking;
-using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.IO;
+using System.Threading;
 
 // 定义单个订单数据结构
 [Serializable]
@@ -30,19 +31,21 @@ public class PurchaseHistoryManager
     private static readonly object _lock = new object();
     
     private string serverUrl = "http://your-server-endpoint.com/upload";
-    private int retryInterval = 30000; // 30秒
-    private string localDataFileName = "purchase_history.json";
-    private string localDataPath;
+    public string serverUrl = "http://your-server-endpoint.com/upload"; // 替换为你的服务器API地址
+    public float retryInterval = 30f; // 重试间隔30秒
+    public string localDataFileName = "purchase_history.json"; // 本地数据文件名
+
     private PurchaseHistory currentHistory = new PurchaseHistory();
+    private string localDataPath;
     private Timer sendTimer;
-    
+
     private PurchaseHistoryManager()
     {
-        localDataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, localDataFileName);
+        localDataPath = Path.Combine(Application.persistentDataPath, localDataFileName);
         LoadLocalHistory();
         
         // 启动定时器，每30秒检查并发送数据
-        sendTimer = new Timer(SendPurchaseHistoryCallback, null, retryInterval, retryInterval);
+        sendTimer = new Timer(SendPurchaseHistoryCallback, null, TimeSpan.FromSeconds(retryInterval), TimeSpan.FromSeconds(retryInterval));
     }
     
     public static PurchaseHistoryManager Instance
@@ -70,17 +73,17 @@ public class PurchaseHistoryManager
             // 这里暂时留空或使用占位符
             ipAddress = "", 
             userId = userId,
-            macAddress = SystemInfo.deviceUniqueIdentifier, // 使用设备唯一标识符作为替代
+            macAddress = SystemInfo.deviceUniqueIdentifier, // 使用设备唯一标识符
             date = DateTime.Now.ToString("yyyy-MM-dd"),
             time = DateTime.Now.ToString("HH:mm:ss")
         };
 
-        currentHistory.purchasehistory.Add(newOrder);
-        SaveLocalHistory();
-        Debug.Log($"订单 {orderId} 已添加到本地记录。");
-
-
-    }
+        lock (_lock)
+        {
+            currentHistory.purchasehistory.Add(newOrder);
+            SaveLocalHistory();
+            Debug.Log($"订单 {orderId} 已添加到本地记录。");
+        }
 
     // 加载本地订单历史
     private void LoadLocalHistory()
@@ -114,76 +117,28 @@ public class PurchaseHistoryManager
         Debug.Log("本地订单历史已清空。");
     }
 
-    // 发送订单历史的协程
-    private IEnumerator SendPurchaseHistoryCoroutine()
+    // 定时器回调方法
+    private void SendPurchaseHistoryCallback(object state)
     {
-        while (true)
+        lock (_lock)
         {
-            // 如果当前没有待发送的订单，则等待一段时间再检查
             if (currentHistory.purchasehistory.Count == 0)
             {
                 Debug.Log("没有待发送的订单数据，等待新数据...");
-                yield return new WaitForSeconds(retryInterval); // 没有数据时也等待，避免无限循环占用CPU
-                continue;
+                return;
             }
-
+                
             string jsonToSend = JsonUtility.ToJson(currentHistory, true);
             Debug.Log($"准备发送 {currentHistory.purchasehistory.Count} 条订单数据到服务器:\n{jsonToSend}");
 
-            using (UnityWebRequest request = new UnityWebRequest(serverUrl, "POST"))
-            {
-                byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonToSend);
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                request.SetRequestHeader("Content-Type", "application/json");
-
-                yield return request.SendWebRequest();
-
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    Debug.Log("订单数据发送成功！服务器响应: " + request.downloadHandler.text);
-                    ClearLocalHistory(); // 发送成功后删除本地数据
-                }
-                else
-                {
-                    Debug.LogError($"订单数据发送失败: {request.error}. 将在 {retryInterval} 秒后重试...");
-                    yield return new WaitForSeconds(retryInterval); // 失败后等待重试
-                }
-            }
-            yield return null; // 每帧检查一次，避免阻塞
+            // 由于UnityWebRequest必须在主线程中调用，这里需要一个机制来调度到主线程
+            // 暂时只打印日志，实际发送逻辑需要通过UnityMainThreadDispatcher或其他方式实现
+            // 或者将发送逻辑完全剥离到MonoBehaviour中
+            // 为了满足用户需求，我将创建一个新的MonoBehaviour来处理发送
+            // 并在这里调用它的发送方法
+            PurchaseHistorySender.Instance.EnqueueData(jsonToSend, serverUrl, () => {
+                // 发送成功后的回调
+                ClearLocalHistory();
+            });
         }
     }
-
-        string jsonToSend = JsonUtility.ToJson(currentHistory, true);
-        Debug.Log($"准备发送 {currentHistory.purchasehistory.Count} 条订单数据到服务器:\n{jsonToSend}");
-
-        using (UnityWebRequest request = new UnityWebRequest(serverUrl, "POST"))
-        {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonToSend);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                Debug.Log("订单数据发送成功！服务器响应: " + request.downloadHandler.text);
-                ClearLocalHistory(); // 发送成功后删除本地数据
-            }
-            else
-            {
-                Debug.LogError($"订单数据发送失败: {request.error}. 将在 {retryInterval} 秒后重试...");
-                yield return new WaitForSeconds(retryInterval);
-                StartCoroutine(SendPurchaseHistoryCoroutine()); // 失败后重试
-            }
-        }
-    }
-
-    // 外部调用示例
-    // public void TestAddAndSend()
-    // {
-    //     AddPurchase("ORDER_123", "USER_ABC");
-    //     AddPurchase("ORDER_456", "USER_DEF");
-    // }
-}

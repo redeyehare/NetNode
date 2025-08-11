@@ -17,7 +17,6 @@ public class OrderData
     public string date;
     public string time;
 }
-
 // 定义订单历史列表，用于JSON序列化
 [Serializable]
 public class PurchaseHistory
@@ -30,7 +29,6 @@ public class PurchaseHistoryManager
     private static PurchaseHistoryManager _instance;
     private static readonly object _lock = new object();
     
-    private string serverUrl = "http://your-server-endpoint.com/upload";
     public string serverUrl = "http://your-server-endpoint.com/upload"; // 替换为你的服务器API地址
     public float retryInterval = 30f; // 重试间隔30秒
     public string localDataFileName = "purchase_history.json"; // 本地数据文件名
@@ -39,7 +37,7 @@ public class PurchaseHistoryManager
     private string localDataPath;
     private Timer sendTimer;
 
-    private PurchaseHistoryManager()
+    public PurchaseHistoryManager()
     {
         localDataPath = Path.Combine(Application.persistentDataPath, localDataFileName);
         LoadLocalHistory();
@@ -47,11 +45,10 @@ public class PurchaseHistoryManager
         // 启动定时器，每30秒检查并发送数据
         sendTimer = new Timer(SendPurchaseHistoryCallback, null, TimeSpan.FromSeconds(retryInterval), TimeSpan.FromSeconds(retryInterval));
     }
-    
     public static PurchaseHistoryManager Instance
     {
         get
-        {C
+        {
             lock (_lock)
             {
                 if (_instance == null)
@@ -84,6 +81,8 @@ public class PurchaseHistoryManager
             SaveLocalHistory();
             Debug.Log($"订单 {orderId} 已添加到本地记录。");
         }
+
+    }
 
     // 加载本地订单历史
     private void LoadLocalHistory()
@@ -142,3 +141,4 @@ public class PurchaseHistoryManager
             });
         }
     }
+}

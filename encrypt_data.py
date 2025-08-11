@@ -10,6 +10,8 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 def encrypt_file_aes_gcm(
     file_path: str,
     password: str,
+    date_string: str,
+
     iterations: int = 100000, # 手机端常用迭代次数，可根据性能和安全需求调整
     salt_length: int = 16 # 盐的长度，推荐16字节
 ) -> dict:
@@ -56,8 +58,7 @@ def encrypt_file_aes_gcm(
     ciphertext = encryptor.update(plaintext) + encryptor.finalize()
     tag = encryptor.tag
 
-    # 5. 获取当前时间戳
-    timestamp = datetime.now().isoformat()
+
 
     # 编码为 Base64 字符串以便于 JSON 存储
     encrypted_data = {
@@ -65,14 +66,15 @@ def encrypt_file_aes_gcm(
         "iv": base64.b64encode(iv).decode('utf-8'),
         "ciphertext": base64.b64encode(ciphertext).decode('utf-8'),
         "tag": base64.b64encode(tag).decode('utf-8'),
-        "timestamp": timestamp,
-        "iterations": iterations,
+
         "salt_length": salt_length,
         "date_string": date_string,
-        "random_number_string": random_number_string
+        "random_num": random_num,
+        "original_data_length": len(plaintext),
+        "iterations": iterations,
     }
 
-    return encrypted_data
+    return encrypted_data, key, iv, ciphertext, tag
 
 if __name__ == "__main__":
     input_file = "/Users/mahe/Project/unity/NetNode/Assets/test/load.json"
@@ -81,17 +83,23 @@ if __name__ == "__main__":
     import random
     current_date = datetime.now().strftime("%Y%m%d")
     random_num = str(random.randint(1000, 9999))
-    secret_password = f"{current_date}{random_num}{100000}"
+    secret_password = f"{current_date}{random_num}"
 
     print(f"正在加密文件：{input_file}")
     print(f"生成的密码：{secret_password}")
-    encrypted_result = encrypt_file_aes_gcm(input_file, secret_password)
+    encrypted_result, key, iv, ciphertext, tag = encrypt_file_aes_gcm(input_file, secret_password, current_date, iterations=100000)
 
     if encrypted_result:
         with open(output_file, 'w') as f:
             json.dump(encrypted_result, f, indent=4)
         print(f"加密成功！加密数据已保存到：{output_file}")
-        print("请注意：此脚本仅为演示目的。在生产环境中，请确保密码管理和密钥分发的安全性。")
+        print("\n加密参数：")
+        print(f"  Key (Base64): {base64.b64encode(key).decode('utf-8')} (Length: {len(key)})")
+        print(f"  IV (Base64): {base64.b64encode(iv).decode('utf-8')} (Length: {len(iv)})")
+        print(f"  Ciphertext (Base64): {base64.b64encode(ciphertext).decode('utf-8')} (Length: {len(ciphertext)})")
+        print(f"  Tag (Base64): {base64.b64encode(tag).decode('utf-8')} (Length: {len(tag)})")
+        print(f"  Salt (Base64): {encrypted_result['salt']} (Length: {encrypted_result['salt_length']})")
+        print("\n请注意：此脚本仅为演示目的。在生产环境中，请确保密码管理和密钥分发的安全性。")
         print("此外，请确保安装了 'cryptography' 库：pip install cryptography")
     else:
         print("加密失败。")

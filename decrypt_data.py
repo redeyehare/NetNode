@@ -58,14 +58,19 @@ if __name__ == "__main__":
     encrypted_file = "/Users/mahe/Project/unity/NetNode/Assets/test/encrypted_data.json"
     output_decrypted_file = "/Users/mahe/Project/unity/NetNode/Assets/test/decrypted_data.json"
     # 这里的 'your_secret_password' 必须与加密时使用的密码一致
-    secret_password = "your_secret_password_here"
-
     print(f"正在读取加密文件：{encrypted_file}")
     try:
         with open(encrypted_file, 'r') as f:
             encrypted_json_data = json.load(f)
         print("加密文件读取成功，开始解析数据...")
-        print(f"加密时间：{encrypted_json_data.get('timestamp', '未知')}")
+
+        current_date = encrypted_json_data.get('date_string')
+        random_num = encrypted_json_data.get('random_num')
+        if not current_date or not random_num:
+            print("错误：加密数据中缺少日期或随机数信息，无法重构密码。")
+            exit()
+        secret_password = f"{current_date}{random_num}"
+
         print(f"KDF 迭代次数：{encrypted_json_data.get('iterations', '未知')}")
         print(f"盐长度：{encrypted_json_data.get('salt_length', '未知')} 字节")
     except FileNotFoundError:

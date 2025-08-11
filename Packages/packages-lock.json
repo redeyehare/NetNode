@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.tivadar.best.http": {
+      "version": "file:com.tivadar.best.http",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.burst": "1.8.23",
+        "com.unity.profiling.core": "1.0.0"
+      }
+    },
     "com.unity.2d.animation": {
       "version": "10.2.0",
       "depth": 1,
@@ -123,8 +132,8 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.21",
-      "depth": 2,
+      "version": "1.8.23",
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.mathematics": "1.2.1",

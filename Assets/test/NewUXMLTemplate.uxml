@@ -1,0 +1,25 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/test/NewUSSFile.uss?fileID=7433441132597879392&amp;guid=ed518785ca6514855a9a56d2f2cd9443&amp;type=3" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:ListView item-template="project://database/Assets/test/xx.uxml?fileID=9197481963319205126&amp;guid=5bf0ac1470d1240639db973e9eda577c&amp;type=3#xx" header-title="123" style="background-color: rgb(130, 46, 46); min-height: 100px; flex-grow: 1;" />
+        <ui:Button text="Button" />
+        <ui:TreeView />
+        <ui:Button text="Button" />
+        <ui:Button text="Button" />
+    </ui:VisualElement>
+    <Utt style="flex-grow: 1; max-height: 300px;" />
+    <ui:VisualElement style="flex-grow: 1;" />
+    <ui:Button text="Button" name="tt" />
+    <ui:VisualElement name="VisualElement" style="flex-grow: 1; -unity-background-scale-mode: stretch-to-fill; background-position-y: center 0; background-position-x: center 0; height: 500px;">
+        <ui:MultiColumnListView style="flex-grow: 1; height: 300px;">
+            <ui:Columns>
+                <ui:Column name="index" title="Index" width="120" />
+                <ui:Column name="active" title="Active?" width="80" />
+                <ui:Column name="tt" title="tt" />
+            </ui:Columns>
+            <ui:SortColumnDescriptions />
+        </ui:MultiColumnListView>
+    </ui:VisualElement>
+    <ui:VisualElement name="VisualElement" style="flex-grow: 1; position: absolute; height: auto; width: auto; right: 0; left: 0; top: 0; bottom: 0; background-color: rgba(0, 0, 255, 0.41); z-index: 1;" />
+    <ui:VisualElement style="flex-grow: 1; position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgb(255, 199, 0);z-index: 0;" />
+</ui:UXML>

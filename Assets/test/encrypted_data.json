@@ -1,9 +1,11 @@
 {
-    "salt": "6N+bhgiY90ZH2B8mcgKovA==",
-    "iv": "VTL8Zlh+OqELRNUd",
-    "ciphertext": "uCC/oGuh1n6Hza2LUR1J6Umy/GdAX6klJRySbKCJirWLgo8W4gN97QKPMmMbdQ840sYD6lFNKeYJKzPCDQy1JjzrpmQOdO5rewNhQyXXyZ5WnOorka7CSD0fyjHaDaJwNi8qCc59GOFDyeeDlnNYB2JQOifUiy6MU1EVug+j8lh+mj0cy7eDPw==",
-    "tag": "M4UzN3g0pfGpLOjlrWRP2Q==",
-    "timestamp": "2025-07-28T23:16:30.619414",
-    "iterations": 100000,
-    "salt_length": 16
+    "salt": "tw7Crh3VK+deMXmJmNk3Gg==",
+    "iv": "IsQ/R8sbxGic2vq1",
+    "ciphertext": "wRCgorViU2IQDihGeWt51KeosEGsZG6+yVlinYmfBT5JCVNRs47eHqANKsJa39v7WlcM8/A7KhwYMPDxDAbZ8XPSZK7D6a+UraLUy7+iO8VSq+KdKxj5vLvTKi4DsnIIGjSa2UsD+8jBSWvGSREWMTyW3aGAbhTcjQlmDfmo7VPdWNtAUomhNg==",
+    "tag": "vjs3bD8zVsFlvHwIs7o+lw==",
+    "salt_length": 16,
+    "date_string": "20250730",
+    "random_num": "5691",
+    "original_data_length": 136,
+    "iterations": 100000
 }

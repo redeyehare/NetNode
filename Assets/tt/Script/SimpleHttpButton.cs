@@ -1,12 +1,21 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Best.HTTP;
+using TMPro;
 
 public class SimpleHttpButton : MonoBehaviour
 {
     public Button requestButton;
-    public InputField urlInput;
+    public TMP_InputField urlInput;
     public Text responseText;
+    [SerializeField]
+    private Transform v2ray;
+    [SerializeField]
+    private Transform clash;
+    [SerializeField]
+    private Transform singbox;
+[SerializeField]
+    public GameObject item;
 
     private void Start()
     {
@@ -37,6 +46,7 @@ public class SimpleHttpButton : MonoBehaviour
     private void SendGetRequest(string url)
     {
         var request = HTTPRequest.CreateGet(url, OnRequestComplete);
+        request.Tag = url; // 将url存储在Tag中
         request.Send();
     }
 
@@ -53,7 +63,9 @@ public class SimpleHttpButton : MonoBehaviour
                     : content;
             }
             
-            Debug.Log($"GET成功: {url}\n响应: {content}");
+            // 从request.Tag中获取url
+            string requestUrl = request.Tag as string;
+            Debug.Log($"GET成功: {requestUrl}\n响应: {content}");
         }
         else
         {

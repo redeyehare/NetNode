@@ -74,7 +74,8 @@ public class HttpButtonListener : MonoBehaviour
         try
         {
             var request = HTTPRequest.CreateGet(url, OnRequestComplete);
-            request.Timeout = TimeSpan.FromSeconds(timeout);
+            request.TimeoutSettings.ConnectTimeout = TimeSpan.FromSeconds(timeout);
+            request.TimeoutSettings.Timeout = TimeSpan.FromSeconds(timeout);
             request.Send();
         }
         catch (Exception ex)

@@ -19,6 +19,10 @@ public class SimpleHttpButton : MonoBehaviour
     private Transform singbox;
     [SerializeField]
     public GameObject item;
+    [SerializeField]
+    //测试按钮
+    public Button test;
+    private JsonLogger jsonLogger;
 
 
     private void Start()
@@ -32,6 +36,23 @@ public class SimpleHttpButton : MonoBehaviour
         {
             urlInput.text = "https://httpbingo.org/get";
         }
+
+        jsonLogger = FindObjectOfType<JsonLogger>();
+        if (jsonLogger == null)
+        {
+            GameObject loggerObject = new GameObject("JsonLogger");
+            jsonLogger = loggerObject.AddComponent<JsonLogger>();
+        }
+
+        if (test != null)
+        {
+            test.onClick.AddListener(OnTestButtonClick);
+        }
+    }
+
+    private void OnTestButtonClick()
+    {
+        // 移除触发和发送功能，此处留空或添加其他测试逻辑
     }
 
     private void OnButtonClick()

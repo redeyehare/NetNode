@@ -1,0 +1,12 @@
+GET https://d1-template.redeyehare.workers.dev/ HTTP/1.1
+
+###
+POST https://d1-template.redeyehare.workers.dev/submit-data HTTP/1.1
+Content-Type: application/json
+
+{
+"root":[{"context":"第一条测试数据"}]
+}
+
+###
+

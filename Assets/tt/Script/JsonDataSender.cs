@@ -39,7 +39,7 @@ public class JsonDataSender : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(30f);
+            yield return new WaitForSeconds(10f);
             SendCurrentJsonData();
         }
     }
@@ -64,14 +64,14 @@ public class JsonDataSender : MonoBehaviour
         request.AddHeader("Content-Type", "application/json");
         request.UploadSettings.UploadStream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonContent));
         request.Send();
-        Debug.Log($"Sending POST request to {url} with JSON data: {jsonContent}");
+        Debug.Log($"Sending POST request to {url} with JSON data (truncated for brevity)..");
     }
 
     private void OnPostRequestComplete(HTTPRequest request, HTTPResponse response)
     {
         if (response != null && response.IsSuccess)
         {
-            Debug.Log($"POST request successful! Response: {response.DataAsText}");
+            Debug.Log($"POST request successful! Response (truncated for brevity)..");
             _data.root.Clear(); // Clear data after successful sending
             SaveJsonToFile(Application.persistentDataPath + "/saved_data.json"); // Save the cleared state
         }
@@ -96,22 +96,15 @@ public class JsonDataSender : MonoBehaviour
 
     public void SaveJsonToFile(string filePath)
     {
-        if (_data.root.Count > 0)
+        string jsonToSave = JsonUtility.ToJson(_data);
+        try
         {
-            string jsonToSave = JsonUtility.ToJson(_data);
-            try
-            {
-                File.WriteAllText(filePath, jsonToSave);
-                Debug.Log($"JSON data saved to: {filePath}");
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"Failed to save JSON data to {filePath}: {e.Message}");
-            }
+            File.WriteAllText(filePath, jsonToSave);
+            Debug.Log($"JSON data saved to: {filePath}. Current data count: {_data.root.Count}");
         }
-        else
+        catch (System.Exception e)
         {
-            Debug.Log("No data to save.");
+            Debug.LogError($"Failed to save JSON data to {filePath}: {e.Message}");
         }
     }
 

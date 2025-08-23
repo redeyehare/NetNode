@@ -12,3 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc4c3205958424ea69c329427e0e6f00, type: 3}
   m_Name: Config
   m_EditorClassIdentifier: 
+  pullUrl: https://github.com/redeyehare/test6/raw/refs/heads/main/202508/18.json
+  serverUrl: https://d1-template.redeyehare.workers.dev/submit-data
+  postRequestInterval: 1
+  getRequestInterval: 10
+  testPostUrl: https://httpbingo.org/post
+  configJsPath: cof.js
+  dataJsPath: data.js

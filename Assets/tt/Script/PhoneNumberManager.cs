@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -31,6 +30,8 @@ public class PhoneNumberManager : MonoBehaviour
     public class AppData
     {
         public string phoneNumber;
+        public string uuid;
+        public string mark = "";
     }
 
     void Awake()
@@ -55,7 +56,6 @@ public class PhoneNumberManager : MonoBehaviour
             ((TextMeshProUGUI)phoneInputField.placeholder).text = placeholderText;
         }
     }
-    
     void SetupEventListeners()
     {
         confirmButton.onClick.AddListener(OnConfirmButtonClicked);
@@ -143,24 +143,50 @@ public class PhoneNumberManager : MonoBehaviour
         return phoneNumber;
     }
     
-    private void SavePhoneNumber(string phoneNumber)
+    public void SavePhoneNumber(string phoneNumber)
+    // This method saves the phone number and updates the mark field.
     {
-        AppData data = new AppData { phoneNumber = phoneNumber };
-        string json = JsonUtility.ToJson(data);
+        AppData currentData = LoadAppData(); // 加载现有数据，LoadAppData现在会处理UUID的生成
+        // 使用 FromJsonOverwrite 更新 phoneNumber
+        // Restored mark field update logic
+        string today = System.DateTime.Now.ToString("yyyy-MM-dd");
+        string patchJson = $"{{ \"phoneNumber\": \"{phoneNumber}\", \"mark\": \"{today}\" }}";
+        JsonUtility.FromJsonOverwrite(patchJson, currentData);
+
+        string json = JsonUtility.ToJson(currentData);
         File.WriteAllText(jsonFilePath, json);
-        Debug.Log($"Phone number saved to {jsonFilePath}");
+        Debug.Log($"Phone number and UUID saved to {jsonFilePath}");
     }
     
-    private string LoadSavedPhoneNumber()
+    private AppData LoadAppData()
     {
         if (File.Exists(jsonFilePath))
         {
             string json = File.ReadAllText(jsonFilePath);
-            AppData data = JsonUtility.FromJson<AppData>(json);
-            Debug.Log($"Phone number loaded from {jsonFilePath}");
-            return data.phoneNumber;
+            AppData data = new AppData();
+            JsonUtility.FromJsonOverwrite(json, data);
+            // 确保加载时也处理UUID
+            if (string.IsNullOrEmpty(data.uuid))
+            {
+                data.uuid = SystemInfo.deviceUniqueIdentifier;
+                Debug.Log($"Generated new UUID: {data.uuid}");
+            }
+            if (string.IsNullOrEmpty(data.mark))
+            {
+                data.mark = System.DateTime.Now.ToString("yyyy-MM-dd");
+                Debug.Log($"Initialized new mark: {data.mark}");
+            }
+            return data;
         }
-        return "";
+        // 如果文件不存在，返回一个新的AppData对象，并生成UUID和mark
+        return new AppData { uuid = SystemInfo.deviceUniqueIdentifier, mark = System.DateTime.Now.ToString("yyyy-MM-dd") };
+    }
+
+    private void LoadSavedPhoneNumber()
+    {
+        AppData data = LoadAppData();
+        phoneInputField.text = data.phoneNumber;
+        Debug.Log($"Loaded phone number: {data.phoneNumber} with UUID: {data.uuid}");
     }
     
     void ShowErrorMessage(string message)
@@ -171,9 +197,24 @@ public class PhoneNumberManager : MonoBehaviour
     
     void OnEnable()
     {
+        // 在启用时加载保存的手机号码
         LoadSavedPhoneNumber();
+
+        // 获取当前日期字符串
+        string today = System.DateTime.Now.ToString("yyyy-MM-dd");
+        AppData data = LoadAppData();
+
+        // 根据mark字段和手机号码是否存在来决定显示哪个面板
+        if (!string.IsNullOrEmpty(phoneInputField.text) && data.mark == today)
+        {
+            currentPhoneNumber = phoneInputField.text;
+            ShowDisplayPanel();
+        }
+        else
+        {
+            ShowInputPanel();
+        }
     }
-    
     void OnDestroy()
     {
         // 清理事件监听

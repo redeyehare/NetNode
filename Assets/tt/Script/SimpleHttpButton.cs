@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using Best.HTTP;
 using TMPro;
 using System.Collections.Generic;
+using System;
 
 public class SimpleHttpButton : MonoBehaviour
 {
@@ -25,6 +26,8 @@ public class SimpleHttpButton : MonoBehaviour
     private JsonLogger jsonLogger;
 
     public TextMeshProUGUI statusText;
+
+    public Config config;
 
 
     private void Start()
@@ -50,12 +53,10 @@ public class SimpleHttpButton : MonoBehaviour
         {
             test.onClick.AddListener(OnTestButtonClick);
         }
+        // 启动时自动执行一次请求
+        OnButtonClick();
     }
 
-    private void OnTestButtonClick()
-    {
-        // 移除触发和发送功能，此处留空或添加其他测试逻辑
-    }
 
     private void OnButtonClick()
     {
@@ -73,6 +74,15 @@ public class SimpleHttpButton : MonoBehaviour
     {
         var request = HTTPRequest.CreateGet(url, OnRequestComplete);
         request.Tag = url; // 将url存储在Tag中
+        
+        // 禁用HTTP/2，强制使用HTTP/1.1避免Ping超时问题
+        var uri = new System.Uri(url);
+        var hostSettings = Best.HTTP.Shared.HTTPManager.PerHostSettings.Get(uri.Host);
+        hostSettings.HTTP2ConnectionSettings.EnableHTTP2Connections = false;
+        
+        // 调整超时设置
+        request.TimeoutSettings.ConnectTimeout = TimeSpan.FromSeconds(15);
+        request.TimeoutSettings.Timeout = TimeSpan.FromSeconds(45);
         request.Send();
     }
 
@@ -82,6 +92,65 @@ public class SimpleHttpButton : MonoBehaviour
         textEditor.text = text;
         textEditor.SelectAll();
         textEditor.Copy();
+    }
+
+    /// <summary>
+    /// 设置按钮点击事件处理器
+    /// </summary>
+    /// <param name="itemButton">要设置点击事件的按钮组件</param>
+    /// <param name="itemData">包含列表数据的ItemData对象</param>
+    /// <param name="groupName">按钮所属的组名称</param>
+    /// <param name="itemNumber">按钮在组中的编号</param>
+    private void SetupButtonClickHandler(Button itemButton, ItemData itemData, string groupName, int itemNumber)
+    {
+        if (itemButton == null) return;
+        
+        itemButton.onClick.RemoveAllListeners();
+        itemButton.onClick.AddListener(() => {
+            // 检查支付状态
+            if (config != null && !string.IsNullOrEmpty(config.configJsPath))
+            {
+                string configData = JsonFileManager.Instance.ReadJson<AppConfig>(config.configJsPath).mark;
+                string currentDate = System.DateTime.Now.ToString("yyyy-MM-dd");
+                // 检查configJsPath是否等于当前日期
+                if (configData != currentDate)
+                {
+                    if (statusText != null)
+                    {
+                        statusText.text = "请支付";
+                    }
+                    return;
+                }
+            }
+            
+            //Debug.Log($"Button clicked! Group: {groupName}, Number: {itemNumber}");
+            if (itemData.list != null && itemNumber - 1 < itemData.list.Count)
+            {
+                CopyToClipboard(itemData.list[itemNumber - 1]);
+                Debug.Log($"Copied to clipboard: {itemData.list[itemNumber - 1]}");
+            }
+            else
+            {
+                Debug.LogWarning($"List item not found for Group: {groupName}, Number: {itemNumber}");
+            }
+        });
+    }
+
+    /// <summary>
+    /// 测试按钮点击事件处理
+    /// </summary>
+    private void OnTestButtonClick()
+    {
+        if (urlInput == null || string.IsNullOrEmpty(urlInput.text))
+            return;
+
+        string url = urlInput.text.Trim();
+        if (!url.StartsWith("http"))
+            url = "https://" + url;
+
+        // 测试请求使用固定的测试URL
+        string testUrl = "https://httpbingo.org/get";
+        SendGetRequest(testUrl);
     }
 
     private void OnRequestComplete(HTTPRequest request, HTTPResponse response)
@@ -123,21 +192,7 @@ public class SimpleHttpButton : MonoBehaviour
                                     Button itemButton = newItem.GetComponentInChildren<Button>();
                                     if (itemButton != null)
                                     {
-                                        string currentGroupName = itemData.name;
-                                        int currentItemNumber = i + 1;
-                                        itemButton.onClick.RemoveAllListeners(); // 移除所有旧的监听器
-                                        itemButton.onClick.AddListener(() => {
-                                            Debug.Log($"Button clicked! Group: {currentGroupName}, Number: {currentItemNumber}");
-                                            if (itemData.list != null && currentItemNumber - 1 < itemData.list.Count)
-                                            {
-                                                CopyToClipboard(itemData.list[currentItemNumber - 1]);
-                                                Debug.Log($"Copied to clipboard: {itemData.list[currentItemNumber - 1]}");
-                                            }
-                                            else
-                                            {
-                                                Debug.LogWarning($"List item not found for Group: {currentGroupName}, Number: {currentItemNumber}");
-                                            }
-                                        });
+                                        SetupButtonClickHandler(itemButton, itemData, itemData.name, i + 1);
                                     }
                                     }
                                     // 在当前folderTransform下的所有item实例化完成后，强制更新布局

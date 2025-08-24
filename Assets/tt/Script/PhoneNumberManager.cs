@@ -28,14 +28,7 @@ public class PhoneNumberManager : MonoBehaviour
     
     private string jsonFilePath;
     private string currentPhoneNumber = "";
-    // 定义一个内部类来存储手机号码数据，以便进行JSON序列化
-    [System.Serializable]
-    public class AppData
-    {
-        public string phoneNumber;
-        public string uuid;
-        public string mark = "";
-    }
+    // AppConfig类已移动到JsonDataClasses.cs文件中，以便统一管理数据模型
 
     /// <summary>
     /// Unity Awake方法：在脚本实例被加载时调用
@@ -223,7 +216,7 @@ public class PhoneNumberManager : MonoBehaviour
     public void SavePhoneNumber(string phoneNumber)
     {
         // 先加载现有数据以获取或生成UUID
-        AppData currentData = LoadAppData();
+        AppConfig currentData = LoadAppData();
         
         // 更新手机号码和mark字段
         string today = System.DateTime.Now.ToString("yyyy-MM-dd");
@@ -245,13 +238,13 @@ public class PhoneNumberManager : MonoBehaviour
     
     /// <summary>
     /// 从本地存储加载应用数据
-    /// 使用JsonFileManager读取JSON文件中的AppData数据
+    /// 使用JsonFileManager读取JSON文件中的AppConfig数据
     /// </summary>
-    /// <returns>从文件中读取的AppData对象</returns>
-    private AppData LoadAppData()
+    /// <returns>从文件中读取的AppConfig对象</returns>
+    private AppConfig LoadAppData()
     {
         // 使用JsonFileManager的ReadJson方法读取数据
-        AppData data = JsonFileManager.Instance.ReadJson<AppData>(jsonFilePath);
+        AppConfig data = JsonFileManager.Instance.ReadJson<AppConfig>(jsonFilePath);
         
         return data;
     }
@@ -278,7 +271,7 @@ public class PhoneNumberManager : MonoBehaviour
         InitializeUI();
         
         // 在启用时加载保存的手机号码
-        AppData data = LoadAppData();
+        AppConfig data = LoadAppData();
         
         // 如果生成了新的UUID或mark，需要保存
         bool needSave = false;
@@ -289,7 +282,7 @@ public class PhoneNumberManager : MonoBehaviour
         }
         if (string.IsNullOrEmpty(data.mark))
         {
-            data.mark = System.DateTime.Now.ToString("yyyy-MM-dd");
+            data.mark = null;
             needSave = true;
         }
         

@@ -775,8 +775,9 @@ MonoBehaviour:
   - {fileID: 1310091302}
   - {fileID: 466677780}
   item: {fileID: 4897267532514900448, guid: a90a76fbe34e842fdb143fc9be9b54f6, type: 3}
-  test: {fileID: 606664277}
+  test: {fileID: 0}
   statusText: {fileID: 1326023889}
+  config: {fileID: 11400000, guid: 175ff5b78b97e429593ca52712062c4c, type: 2}
 --- !u!114 &583628314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -809,6 +810,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   testsavejson: {fileID: 606664277}
+  config: {fileID: 11400000, guid: 175ff5b78b97e429593ca52712062c4c, type: 2}
   postUrl: https://m1.apifoxmock.com/m1/2693195-2630989-default/user
 --- !u!1 &599904304
 GameObject:
@@ -957,7 +959,7 @@ GameObject:
   - component: {fileID: 606664278}
   - component: {fileID: 606664277}
   m_Layer: 5
-  m_Name: Button
+  m_Name: paymentButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1451,7 +1453,7 @@ GameObject:
   - component: {fileID: 875829833}
   - component: {fileID: 875829832}
   m_Layer: 5
-  m_Name: Button
+  m_Name: RequestButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3525,7 +3527,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535

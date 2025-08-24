@@ -24,6 +24,8 @@ public class SimpleHttpButton : MonoBehaviour
     public Button test;
     private JsonLogger jsonLogger;
 
+    public TextMeshProUGUI statusText;
+
 
     private void Start()
     {
